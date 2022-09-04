@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block title %}Cart{% endblock %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<section class="product_section layout_padding">
+   <div class="container">
+      <div class="heading_container heading_center">
+         <h2>
+            Your <span>cart</span>
+         </h2>
+      </div>
+      <div class="row">
+         {% for obj in data %}
+         <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="box">
+               <div class="option_container">
+                  <div class="options">
+                     <form action="/remove-from-cart" method="post">
+                     <input type="hidden" name="add_to_cart">
+                     <input type="hidden" name="product_id" value="{{ obj.id }}">
+                     <input type="hidden" name="product_name" value="{{ obj.name }}">
+                     <input type="hidden" name="product_price" value="{{ obj.price }}">
+                     <input type="hidden" name="product_image" value="{{ obj.image }}">
+                     <input type="hidden" name="qty" value="1">
+                 
+                     <button type="submit" name="add_to_cart" class="option1">Remove From Cart</b>
+                 </form>
+                     <a href="/order/{{ obj.id }}" class="option2">
+                     Buy Now
+                     </a>
+                  </div>
+               </div>
+               <div class="img-box">
+                  <img src="/static/images/{{ obj.image }}" alt="">
+               </div>
+               <div class="detail-box">
+                  <h5>
+                     {{ obj.name }}
+                  </h5>
+                  <h6>
+                     ${{ obj.rprice }}
+                  </h6>
+                  <h6>x{{ obj.q }}</h6>
+               </div>
+            </div>
+         </div>
+         {% endfor %}
+      </div>
+   </div>
+</section>
+<h1>Items: {{ amount }}</h1>
+<h1>Total Price: ${{ tprice }}</h1>
+<a href="/order/cart/" class="option2">
+   Checkout
+</a>
+{% endblock %}

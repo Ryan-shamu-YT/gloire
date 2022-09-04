@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block title %}Search - {{ id }}{% endblock %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="{{ url_for('search') }}">
+        <input type="text" class="q" name="q">
+        <i class="fa fa-search"></i>
+        <input type="submit">
+    </form>
+    <section class="product_section layout_padding">
+      <div class="container">
+         <div class="heading_container heading_center">
+            {% if id %}
+            <h2>
+               Search Results For "{{ id }}"
+            </h2>
+            {% endif %}
+         </div>
+         <h1>{{ msg }}</h1>
+         <div class="row">
+            {% for obj in data %}
+            <div class="col-sm-6 col-md-4 col-lg-3">
+               <div class="box">
+                  <div class="option_container">
+                     <div class="options">
+                        <form action="/add-to-cart" method="post">
+                        <input type="hidden" name="add_to_cart">
+                        <input type="hidden" name="product_id" value="{{ obj.id }}">
+                        <input type="hidden" name="product_name" value="{{ obj.name }}">
+                        <input type="hidden" name="product_price" value="{{ obj.price }}">
+                        <input type="hidden" name="product_image" value="{{ obj.image }}">
+                        <input type="hidden" name="rprice" value="{{ obj.rprice }}">
+                        <input type="hidden" name="qty" value="1">
+                    
+                        <button type="submit" name="add_to_cart" class="option1">Add to Cart</b>
+                    </form>
+                        <a class="option2" href="/order/{{ obj.id }}">
+                        Buy Now
+                        </a>
+                     </div>
+                  </div>
+                  <div class="img-box">
+                     <img src="/static/images/{{ obj.image }}" alt="">
+                  </div>
+                  <div class="detail-box">
+                     <h5>
+                        {{ obj.name }}
+                     </h5>
+                     <h6>
+                        ${{ obj.rprice }}
+                     </h6>
+                  </div>
+               </div>
+            </div>
+            {% endfor %}
+   </div>
+</div>
+</section>
+{% endblock %}

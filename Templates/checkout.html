@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Checkout{% endblock %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+        <div>
+            <div class="img-box">
+                <img src="/static/images/{{ dtaa.image }}" alt="">
+             </div>
+             <div class="detail-box">
+                <h5>
+                   {{ dtaa.name }}
+                </h5>
+                <h6>
+                   ${{ dtaa.rprice }}
+                </h6>
+             </div>
+
+                <form class="form" action="{{ url_for('checkout') }}" method="post" >
+                    <label for="Quantity">Amount</label>
+                    <input type="number" name="Qauntity" value="1" required class="Quantity">
+                    <label for="Creditcard">Card number</label>
+                    <input type="text" name="Creditcard" required class="Creditcard" >
+                    <input type="submit" value="buy">
+                    <h4>{{ msg }}</h4>
+                </form>
+
+        </div>
+{% endblock %}
