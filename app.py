@@ -2,7 +2,15 @@ import smtplib as smtp
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from flask_mysqldb import MySQL
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="yourusername",
+  password="yourpassword",
+  database="mydatabase"
+)
+
 import MySQLdb.cursors
 import re
 
@@ -22,14 +30,7 @@ stripe.api_key = stripe_keys["secret_key"]
 app = Flask(__name__)
 app.secret_key = 'GloireBabies52598'
 
-
-app.config['MYSQL_HOST'] = "127.0.0.1"
-app.config['MYSQL_PORT'] = 3307
-app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = ""
-app.config['MYSQL_DB'] = "gloirebabies"
-
-mysql = MySQL(app)
+cursor = mydb.cursor()
 
 @app.route('/success/')
 def yes():
@@ -42,7 +43,7 @@ def no():
 
 @app.route('/order/cart/')
 def corder():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
     cursor.execute("SELECT * FROM `cart` WHERE `owner` = %s ", (session['username'],))
     product = cursor.fetchall()
 
@@ -116,14 +117,12 @@ def order(product_id):
 @app.route('/')
 @app.route('/home/')
 def home():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM `news`')
     returndata = cursor.fetchall()
     return render_template('home.html', news=returndata)
 
 @app.route('/profile/<id>')
 def profile(id):
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM `users` where id = %s', (id,))
     userc = cursor.fetchone()
 
@@ -133,7 +132,6 @@ def profile(id):
 
 @app.route('/products/')
 def products():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM `products`')
     returndata = cursor.fetchall()
     return render_template('products.html', product=returndata)
@@ -141,7 +139,6 @@ def products():
 
 @app.route('/add-to-cart', methods=['GET', 'POST'])
 def add_to_cart():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if request.method == 'POST':
         id = int(request.form['product_id'])
         name = request.form['product_name']
@@ -165,7 +162,7 @@ def add_to_cart():
 
 @app.route('/remove-from-cart', methods=['GET', 'POST'])
 def remove_from_cart():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
     if request.method == 'POST':
         id = int(request.form['product_id'])
         name = request.form['product_name']
@@ -179,7 +176,7 @@ def remove_from_cart():
 
 @app.route('/cart/')
 def cart():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
     username = session['username']
     cursor.execute('SELECT * FROM `cart` WHERE `owner` = %s', (username,))
     returndata = cursor.fetchall()
@@ -198,7 +195,6 @@ def search():
     dataa = ()
     if request.method == 'POST' and 'q' in request.form:
         id = request.form['q']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM `products` WHERE (CONVERT(`name` USING utf8)) REGEXP %s LIMIT 0, 50;', (id,))
         dataa = cursor.fetchall()
         if dataa == ():
@@ -209,7 +205,6 @@ def search():
 
 @app.route('/checkout/', methods=['GET', 'POST'])
 def checkout():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     id = request.args.get('id')
     cursor.execute('SELECT * FROM `products` WHERE `id` = % s', (id,))
     data = cursor.fetchone()
@@ -223,7 +218,7 @@ def login():
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE username = %s AND password = %s', (username, password,))
         account = cursor.fetchone()
         if account:
@@ -250,14 +245,12 @@ def logout():
 
 @app.route('/signup/', methods=['GET', 'POST'])
 def signup():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     msg = ''
     username = ''
     password = ''
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM `users` WHERE `username` = %s', (username,))
         account = cursor.fetchone()
         if account:
